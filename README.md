@@ -299,7 +299,7 @@ Contributions, issues, and feature suggestions are welcome.
 
 Backend Developer | Python | Django | FastAPI | REST APIs
 
-GitHub: `https://github.com/YOUR_GITHUB_USERNAME`
+GitHub: `https://github.com/vikas-11`
 
 ---
 
