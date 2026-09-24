@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block title %}{% if mode == 'edit' %}Edit post{% else %}Create post{% endif %} · Pulse{% endblock %}
+{% block content %}
+<div class="page-header compact">
+    <a class="back-link" href="{% if tweet %}{% url 'tweet_detail' tweet.id %}{% else %}{% url 'tweet_list' %}{% endif %}">← Cancel</a>
+    <h1>{% if mode == 'edit' %}Edit your post{% else %}Create a new post{% endif %}</h1>
+    <p>{% if mode == 'edit' %}Refine your thought without losing the conversation around it.{% else %}Keep it concise, useful and authentically you.{% endif %}</p>
+</div>
+
+<section class="form-card composer-card">
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="composer-user">
+            <span class="avatar">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">{% else %}{{ user.username|first|upper }}{% endif %}</span>
+            <div><strong>{{ user.get_full_name|default:user.username }}</strong><small>@{{ user.username }}</small></div>
+        </div>
+
+        <div class="field-wrap">
+            {{ form.text_field }}
+            {% if form.text_field.errors %}<div class="field-errors">{{ form.text_field.errors }}</div>{% endif %}
+            <div class="character-row"><span>Short posts get read.</span><strong><span data-character-count>0</span>/240</strong></div>
+        </div>
+
+        <div class="upload-box">
+            <div><strong>Add a visual</strong><span>JPG, PNG or WEBP works best.</span></div>
+            {{ form.photo }}
+            {% if form.photo.errors %}<div class="field-errors">{{ form.photo.errors }}</div>{% endif %}
+        </div>
+
+        {% if tweet.photo %}<img class="image-preview visible" data-image-preview src="{{ tweet.photo.url }}" alt="Current post image">{% else %}<img class="image-preview" data-image-preview alt="Selected image preview">{% endif %}
+
+        <div class="form-actions">
+            <a class="btn btn-ghost" href="{% url 'tweet_list' %}">Cancel</a>
+            <button class="btn btn-primary" type="submit">{% if mode == 'edit' %}Save changes{% else %}Publish post{% endif %}</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block title %}Control Center · Pulse{% endblock %}
+{% block content %}
+<section class="admin-hero">
+    <div>
+        <span class="eyebrow">{% if user.is_superuser %}Super admin{% else %}Admin workspace{% endif %}</span>
+        <h1>Control Center</h1>
+        <p>Review activity, find any post, and manage community content from one place.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'tweet_create' %}">＋ Create post</a>
+</section>
+
+<section class="admin-metrics" aria-label="Community overview">
+    <article class="admin-metric-card"><span>Posts</span><strong>{{ total_posts }}</strong><small>Published across Pulse</small></article>
+    <article class="admin-metric-card"><span>Members</span><strong>{{ total_users }}</strong><small>Registered accounts</small></article>
+    <article class="admin-metric-card"><span>Replies</span><strong>{{ total_comments }}</strong><small>Conversation activity</small></article>
+    <article class="admin-metric-card"><span>Likes</span><strong>{{ total_likes }}</strong><small>Community reactions</small></article>
+</section>
+
+<section class="admin-panel">
+    <div class="admin-panel-head">
+        <div>
+            <span class="eyebrow">Content management</span>
+            <h2>All posts</h2>
+        </div>
+        <form class="admin-search" method="get">
+            <input type="search" name="q" value="{{ query }}" placeholder="Search content or username">
+            <input type="text" name="author" value="{{ author }}" placeholder="Exact username">
+            <button class="btn btn-ghost" type="submit">Filter</button>
+            {% if query or author %}<a class="admin-clear" href="{% url 'admin_dashboard' %}">Clear</a>{% endif %}
+        </form>
+    </div>
+
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Post</th>
+                    <th>Author</th>
+                    <th>Activity</th>
+                    <th>Published</th>
+                    <th class="admin-actions-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                    <tr>
+                        <td>
+                            <a class="admin-post-preview" href="{% url 'tweet_detail' post.id %}">
+                                {% if post.photo %}<img src="{{ post.photo.url }}" alt="" loading="lazy">{% endif %}
+                                <span><strong>#{{ post.id }}</strong>{{ post.text_field|truncatechars:78 }}</span>
+                            </a>
+                        </td>
+                        <td>
+                            <a class="admin-author" href="{% url 'profile' post.user.username %}">
+                                <span class="avatar avatar-sm">{% if post.user.profile.avatar %}<img src="{{ post.user.profile.avatar.url }}" alt="{{ post.user.username }}">{% else %}{{ post.user.username|first|upper }}{% endif %}</span>
+                                <span><strong>{{ post.user.get_full_name|default:post.user.username }}</strong><small>@{{ post.user.username }}</small></span>
+                            </a>
+                        </td>
+                        <td><span class="admin-activity">♥ {{ post.like_count|default:0 }} <span>·</span> ◌ {{ post.comment_count|default:0 }}</span></td>
+                        <td><span class="admin-date">{{ post.created_at|date:"M j, Y" }}<small>{{ post.created_at|date:"g:i A" }}</small></span></td>
+                        <td>
+                            <div class="admin-row-actions">
+                                <a class="admin-action edit" href="{% url 'admin_tweet_edit' post.id %}">Edit</a>
+                                <a class="admin-action delete" href="{% url 'admin_tweet_delete' post.id %}">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5"><div class="admin-empty">No posts match your filters.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% include "tweet/_pagination.html" %}
+</section>
+
+<section class="admin-panel compact-admin-panel">
+    <div class="admin-panel-head">
+        <div><span class="eyebrow">Recently joined</span><h2>Newest members</h2></div>
+    </div>
+    <div class="admin-user-strip">
+        {% for member in latest_users %}
+            <a href="{% url 'profile' member.username %}" class="admin-user-card">
+                <span class="avatar">{% if member.profile.avatar %}<img src="{{ member.profile.avatar.url }}" alt="{{ member.username }}">{% else %}{{ member.username|first|upper }}{% endif %}</span>
+                <span><strong>{{ member.get_full_name|default:member.username }}</strong><small>@{{ member.username }}</small></span>
+                {% if member.is_superuser %}<em>Super admin</em>{% elif member.is_staff %}<em>Admin</em>{% endif %}
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

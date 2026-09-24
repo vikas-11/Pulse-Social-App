@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block title %}@{{ profile_user.username }} · Pulse{% endblock %}
+{% block content %}
+<section class="profile-hero">
+    <div class="profile-cover"><span class="profile-spark one"></span><span class="profile-spark two"></span></div>
+    <div class="profile-body">
+        <div class="profile-topline">
+            <span class="avatar avatar-xl">{% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">{% else %}{{ profile_user.username|first|upper }}{% endif %}</span>
+            {% if user == profile_user %}<a class="btn btn-ghost" href="{% url 'profile_edit' %}">Edit profile</a>{% endif %}
+        </div>
+        <h1>{{ profile_user.get_full_name|default:profile_user.username }}</h1>
+        <div class="profile-handle">@{{ profile_user.username }}</div>
+        {% if profile.bio %}<p class="profile-bio">{{ profile.bio }}</p>{% else %}<p class="profile-bio muted">No bio yet.</p>{% endif %}
+        <div class="profile-meta">
+            {% if profile.location %}<span>⌖ {{ profile.location }}</span>{% endif %}
+            <span>Joined {{ profile_user.date_joined|date:"M Y" }}</span>
+        </div>
+        <div class="profile-stats">
+            <div><strong>{{ page_obj.paginator.count }}</strong><span>Posts</span></div>
+            <div><strong>{{ profile_user.liked_tweets.count }}</strong><span>Likes</span></div>
+            <div><strong>{{ profile_user.tweet_comments.count }}</strong><span>Replies</span></div>
+        </div>
+    </div>
+</section>
+
+<div class="section-label-row"><span class="eyebrow">Recent activity</span><h2>Posts by {{ profile_user.first_name|default:profile_user.username }}</h2></div>
+<div class="feed-list">
+    {% for tweet in tweets %}{% include "tweet/_tweet_card.html" with tweet=tweet %}{% empty %}<div class="empty-state compact"><h2>No posts yet</h2><p>When {{ profile_user.username }} posts, it will appear here.</p></div>{% endfor %}
+</div>
+{% include "tweet/_pagination.html" %}
+{% endblock %}

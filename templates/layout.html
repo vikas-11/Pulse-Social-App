@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pulse — a polished social space for ideas, images and conversations.">
+    <title>{% block title %}Pulse{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script defer src="{% static 'app.js' %}"></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="{% url 'tweet_list' %}" aria-label="Pulse home">
+                <span class="brand-mark">P</span>
+                <span class="brand-text">Pulse</span>
+            </a>
+
+            <form class="global-search" method="get" action="{% url 'tweet_list' %}">
+                <span class="search-icon">⌕</span>
+                <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Search people or posts" aria-label="Search">
+            </form>
+
+            <div class="topbar-actions">
+                <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle theme">◐</button>
+                {% if user.is_authenticated %}
+                    <a class="mini-profile" href="{% url 'profile' user.username %}">
+                        <span class="avatar avatar-sm">
+                            {% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">{% else %}{{ user.username|first|upper }}{% endif %}
+                        </span>
+                        <span class="mini-profile-copy">
+                            <strong>{{ user.first_name|default:user.username }}</strong>
+                            <small>@{{ user.username }}{% if user.is_superuser %} · Super admin{% elif user.is_staff %} · Admin{% endif %}</small>
+                        </span>
+                    </a>
+                {% else %}
+                    <a class="btn btn-ghost" href="{% url 'login' %}">Log in</a>
+                    <a class="btn btn-primary" href="{% url 'register' %}">Join Pulse</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="app-shell">
+        <aside class="sidebar left-sidebar">
+            <nav class="side-nav">
+                <a class="nav-pill {% if request.resolver_match.url_name == 'tweet_list' %}active{% endif %}" href="{% url 'tweet_list' %}"><span>⌂</span> Home</a>
+                {% if user.is_authenticated %}
+                    <a class="nav-pill {% if request.resolver_match.url_name == 'bookmarks' %}active{% endif %}" href="{% url 'bookmarks' %}"><span>♡</span> Saved</a>
+                    <a class="nav-pill {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' user.username %}"><span>◎</span> Profile</a>
+                    <a class="nav-pill" href="{% url 'tweet_create' %}"><span>＋</span> Create</a>
+                    {% if user.is_staff %}<a class="nav-pill {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}"><span>◇</span> Control Center</a>{% endif %}
+                {% endif %}
+            </nav>
+
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary btn-block compose-side" href="{% url 'tweet_create' %}">Create post</a>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button class="nav-pill danger" type="submit"><span>↗</span> Log out</button>
+                </form>
+            {% endif %}
+
+            <div class="sidebar-note">
+                <strong>Made for conversation</strong>
+                <p>A focused social experience with posts, replies, saves, search and personal profiles.</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            {% if messages %}
+                <div class="message-stack">
+                    {% for message in messages %}
+                        <div class="flash {{ message.tags|default:'info' }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+
+        <aside class="sidebar right-sidebar">
+            <div class="panel trend-panel">
+                <div class="panel-heading">
+                    <span class="eyebrow">Discover</span>
+                    <h3>What’s happening</h3>
+                </div>
+                <div class="trend-item"><small>Development</small><strong>#BuildBetter</strong><span>Build clean. Ship fast.</span></div>
+                <div class="trend-item"><small>Backend</small><strong>#Python</strong><span>Readable code, powerful ecosystem.</span></div>
+                <div class="trend-item"><small>Learning</small><strong>#BuildInPublic</strong><span>Turn tutorials into products.</span></div>
+            </div>
+
+            {% if not user.is_authenticated %}
+                <div class="panel join-panel">
+                    <span class="eyebrow">New here?</span>
+                    <h3>Join the conversation.</h3>
+                    <p>Create an account to post, like, reply and save your favorite ideas.</p>
+                    <a class="btn btn-primary btn-block" href="{% url 'register' %}">Create free account</a>
+                </div>
+            {% endif %}
+
+            <footer class="mini-footer">Pulse · Ideas in motion · {% now "Y" %}</footer>
+        </aside>
+    </div>
+
+    <nav class="mobile-nav">
+        <a href="{% url 'tweet_list' %}">⌂<span>Home</span></a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'bookmarks' %}">♡<span>Saved</span></a>
+            <a class="mobile-create" href="{% url 'tweet_create' %}">＋</a>
+            <a href="{% url 'profile' user.username %}">◎<span>Profile</span></a>
+        {% else %}
+            <a href="{% url 'login' %}">◎<span>Login</span></a>
+            <a href="{% url 'register' %}">＋<span>Join</span></a>
+        {% endif %}
+    </nav>
+</body>
+</html>

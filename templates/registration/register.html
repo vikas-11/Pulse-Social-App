@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Join Pulse{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-intro">
+        <span class="eyebrow">Create your space</span>
+        <h1>Turn thoughts into conversations.</h1>
+        <p>Join a clean, focused social space. Share ideas, images and useful replies.</p>
+        <div class="metric-row"><div><strong>240</strong><span>characters</span></div><div><strong>∞</strong><span>ideas</span></div><div><strong>1</strong><span>community</span></div></div>
+    </div>
+    <div class="auth-card">
+        <div class="auth-card-head"><span class="brand-mark">P</span><div><h2>Create account</h2><p>It only takes a minute.</p></div></div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="form-alert">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small class="help-text">{{ field.help_text|safe }}</small>{% endif %}
+                    {% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+            <button class="btn btn-primary btn-block auth-submit" type="submit">Create my account</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+</section>
+{% endblock %}

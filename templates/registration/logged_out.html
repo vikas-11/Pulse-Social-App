@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Logged out · Pulse{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+{% block content %}
+<section class="decision-card positive">
+    <div class="decision-icon">✓</div>
+    <span class="eyebrow">Session ended</span>
+    <h1>You’re logged out.</h1>
+    <p>Your session ended safely. Come back whenever you have something worth sharing.</p>
+    <div class="decision-actions"><a class="btn btn-ghost" href="{% url 'tweet_list' %}">Browse feed</a><a class="btn btn-primary" href="{% url 'login' %}">Log in again</a></div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Saved posts · Pulse{% endblock %}
+{% block content %}
+<div class="page-header">
+    <span class="eyebrow">Your collection</span>
+    <h1>Saved posts</h1>
+    <p>Everything you bookmarked, kept in one quiet place.</p>
+</div>
+<div class="feed-list">
+    {% for tweet in tweets %}
+        {% include "tweet/_tweet_card.html" with tweet=tweet %}
+    {% empty %}
+        <div class="empty-state"><div class="empty-icon">◇</div><h2>Nothing saved yet</h2><p>Tap the save icon on any post to keep it here.</p><a class="btn btn-primary" href="{% url 'tweet_list' %}">Explore the feed</a></div>
+    {% endfor %}
+</div>
+{% include "tweet/_pagination.html" %}
+{% endblock %}

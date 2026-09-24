@@ -1,0 +1,56 @@
+<article class="post-card">
+    <div class="post-head">
+        <a class="user-cluster" href="{% url 'profile' tweet.user.username %}">
+            <span class="avatar">
+                {% if tweet.user.profile.avatar %}<img src="{{ tweet.user.profile.avatar.url }}" alt="{{ tweet.user.username }}">{% else %}{{ tweet.user.username|first|upper }}{% endif %}
+            </span>
+            <span>
+                <strong>{{ tweet.user.get_full_name|default:tweet.user.username }}</strong>
+                <small>@{{ tweet.user.username }} · {{ tweet.created_at|timesince }} ago</small>
+            </span>
+        </a>
+        {% if user.is_staff %}
+            <div class="owner-actions admin-owner-actions">
+                <span class="moderation-label">Admin</span>
+                <a href="{% url 'admin_tweet_edit' tweet.id %}" title="Edit as admin">Edit</a>
+                <a class="danger-link" href="{% url 'admin_tweet_delete' tweet.id %}" title="Delete as admin">Delete</a>
+            </div>
+        {% elif tweet.user == user %}
+            <div class="owner-actions">
+                <a href="{% url 'tweet_edit' tweet.id %}" title="Edit">Edit</a>
+                <a class="danger-link" href="{% url 'tweet_delete' tweet.id %}" title="Delete">Delete</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <a class="post-copy" href="{% url 'tweet_detail' tweet.id %}">{{ tweet.text_field|linebreaksbr }}</a>
+
+    {% if tweet.photo %}
+        <a class="post-image-wrap" href="{% url 'tweet_detail' tweet.id %}">
+            <img class="post-image" src="{{ tweet.photo.url }}" alt="Image shared by {{ tweet.user.username }}" loading="lazy">
+        </a>
+    {% endif %}
+
+    <div class="post-actions">
+        <a class="action-link" href="{% url 'tweet_detail' tweet.id %}"><span>◌</span><span>{{ tweet.comment_count|default:tweet.comments.count }}</span></a>
+
+        <form method="post" action="{% url 'toggle_like' tweet.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="action-button {% if user.is_authenticated and user in tweet.likes.all %}liked{% endif %}" type="submit" title="Like">
+                <span>{% if user.is_authenticated and user in tweet.likes.all %}♥{% else %}♡{% endif %}</span>
+                <span>{{ tweet.like_count|default:tweet.likes.count }}</span>
+            </button>
+        </form>
+
+        <button class="action-button copy-link" type="button" data-copy-url="{{ request.scheme }}://{{ request.get_host }}{% url 'tweet_detail' tweet.id %}" title="Copy link"><span>↗</span><span>Share</span></button>
+
+        <form method="post" action="{% url 'toggle_bookmark' tweet.id %}" class="push-right">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button class="action-button {% if user.is_authenticated and user in tweet.bookmarks.all %}saved{% endif %}" type="submit" title="Save">
+                <span>{% if user.is_authenticated and user in tweet.bookmarks.all %}◆{% else %}◇{% endif %}</span>
+            </button>
+        </form>
+    </div>
+</article>

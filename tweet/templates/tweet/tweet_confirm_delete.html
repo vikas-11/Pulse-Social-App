@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Delete post · Pulse{% endblock %}
+{% block content %}
+<section class="decision-card">
+    <div class="decision-icon">!</div>
+    <span class="eyebrow">Permanent action</span>
+    <h1>Delete this post?</h1>
+    <p>This will remove the post, its likes and all replies. This action cannot be undone.</p>
+    <blockquote>{{ tweet.text_field|truncatechars:140 }}</blockquote>
+    <form method="post" class="decision-actions">
+        {% csrf_token %}
+        <a class="btn btn-ghost" href="{% url 'tweet_detail' tweet.id %}">Keep post</a>
+        <button class="btn btn-danger" type="submit">Delete permanently</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %}{% if query %}Search · Pulse{% else %}Home · Pulse{% endif %}{% endblock %}
+{% block content %}
+<section class="feed-hero">
+    <div>
+        <span class="eyebrow">Your feed</span>
+        <h1>{% if query %}Search results{% else %}Ideas worth sharing.{% endif %}</h1>
+        <p>{% if query %}Showing posts and people matching “{{ query }}”.{% else %}A polished community for sharing short ideas, images and conversations.{% endif %}</p>
+    </div>
+    {% if user.is_authenticated %}
+        <a class="btn btn-primary" href="{% url 'tweet_create' %}">＋ New post</a>
+    {% endif %}
+</section>
+
+{% if user.is_authenticated and not query %}
+<a class="quick-compose" href="{% url 'tweet_create' %}">
+    <span class="avatar">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}">{% else %}{{ user.username|first|upper }}{% endif %}</span>
+    <span class="quick-compose-placeholder">Share something interesting…</span>
+    <span class="quick-compose-button">Post</span>
+</a>
+{% endif %}
+
+{% if query %}
+<div class="search-chip-row">
+    <span class="search-chip">Search: {{ query }}</span>
+    <a href="{% url 'tweet_list' %}">Clear</a>
+</div>
+{% endif %}
+
+<div class="feed-list">
+    {% for tweet in tweets %}
+        {% include "tweet/_tweet_card.html" with tweet=tweet %}
+    {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">✦</div>
+            <h2>{% if query %}No matches yet{% else %}Your feed is waiting{% endif %}</h2>
+            <p>{% if query %}Try a different keyword or username.{% else %}Be the first to publish something worth talking about.{% endif %}</p>
+            {% if user.is_authenticated %}<a class="btn btn-primary" href="{% url 'tweet_create' %}">Create the first post</a>{% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+{% include "tweet/_pagination.html" %}
+{% endblock %}

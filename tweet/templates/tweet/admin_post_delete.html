@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Delete Post · Control Center{% endblock %}
+{% block content %}
+<section class="admin-delete-shell">
+    <a class="back-link" href="{% url 'admin_dashboard' %}">← Back to Control Center</a>
+    <div class="decision-card admin-danger-card">
+        <span class="danger-symbol">!</span>
+        <span class="eyebrow">Permanent action</span>
+        <h1>Delete post #{{ tweet.id }}?</h1>
+        <p>This post belongs to <strong>@{{ tweet.user.username }}</strong>. Deleting it also removes its replies, likes and saved references.</p>
+        <blockquote>{{ tweet.text_field|truncatechars:180 }}</blockquote>
+        <form method="post" class="decision-actions">
+            {% csrf_token %}
+            <a class="btn btn-ghost" href="{% url 'admin_dashboard' %}">Keep post</a>
+            <button class="btn btn-danger" type="submit">Delete permanently</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

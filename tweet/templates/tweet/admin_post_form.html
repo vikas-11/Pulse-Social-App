@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}Edit Post · Control Center{% endblock %}
+{% block content %}
+<section class="admin-editor-shell">
+    <div class="admin-editor-head">
+        <div>
+            <a class="back-link" href="{% url 'admin_dashboard' %}">← Back to Control Center</a>
+            <span class="eyebrow">Content management</span>
+            <h1>Edit post #{{ tweet.id }}</h1>
+            <p>You are editing a post published by <a href="{% url 'profile' tweet.user.username %}">@{{ tweet.user.username }}</a>.</p>
+        </div>
+        <span class="admin-role-badge">{% if user.is_superuser %}Super admin{% else %}Admin{% endif %}</span>
+    </div>
+
+    <div class="form-card admin-editor-card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-field">
+                    {% if field.label %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{% endif %}
+                    {{ field }}
+                    {% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+            {% if tweet.photo %}
+                <div class="admin-current-media"><span>Current image</span><img src="{{ tweet.photo.url }}" alt="Current post image"></div>
+            {% endif %}
+            <div class="admin-editor-actions">
+                <a class="btn btn-ghost" href="{% url 'admin_dashboard' %}">Cancel</a>
+                <button class="btn btn-primary" type="submit">Save changes</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

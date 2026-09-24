@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Edit profile · Pulse{% endblock %}
+{% block content %}
+<div class="page-header compact"><a class="back-link" href="{% url 'profile' user.username %}">← Back to profile</a><h1>Edit profile</h1><p>Make your profile feel like you.</p></div>
+<section class="form-card">
+    <form method="post" enctype="multipart/form-data" class="profile-edit-form">
+        {% csrf_token %}
+        <div class="settings-section"><h3>Account</h3><p>Basic information shown across Pulse.</p>
+            {% for field in user_form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
+        </div>
+        <div class="settings-section"><h3>Profile</h3><p>Add personality with a photo, bio and location.</p>
+            {% for field in profile_form %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% if field.errors %}<div class="field-errors">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
+        </div>
+        <div class="form-actions"><a class="btn btn-ghost" href="{% url 'profile' user.username %}">Cancel</a><button class="btn btn-primary" type="submit">Save profile</button></div>
+    </form>
+</section>
+{% endblock %}
